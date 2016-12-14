@@ -13,7 +13,8 @@ DECLARE
   temp1 int;
   temp2 int;
 BEGIN
-    INSERT INTO Countries(Name) VALUES ('TestCity') RETURNING Id into CityID;
+    INSERT INTO Countries(Name) VALUES ('TestCity')
+    RETURNING Id into CityID;
     INSERT INTO Regions(Name, CountryID) VALUES ('TestRegion', CityID) RETURNING id into RegionIDs;
     INSERT INTO Operators(Name) VALUES ('TestOperator') RETURNING id into OperatorID;
     INSERT INTO Tariffs VALUES (DEFAULT, NULL, 0,  160, 1,  160, 1,  NULL, 0, 1) RETURNING id into HomeNetworkTariffID;
