@@ -15,7 +15,7 @@ body{
 div {
 	clear: both;
 	padding: 8px 0;
-	overflow: hidden;
+	/*overflow: hidden;*/
 }
 
 form {
@@ -103,7 +103,7 @@ button {
 	-ms-transition: 0.1s linear all;
 	-o-transition: 0.1s linear all;
 	transition: 0.1s linear all;
-	float: right;
+	/*float: right;*/
 }
 
 button[type=reset] {
@@ -236,6 +236,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 .rwd-table td {
   margin: .5em 1em;
 }
+
 @media (min-width: 480px) {
   .rwd-table th,
   .rwd-table td {
