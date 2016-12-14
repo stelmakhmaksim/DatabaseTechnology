@@ -1,117 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>TPYD</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+    <meta charset="UTF-8">
+    <title>TPYD</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-	<form>
-				<div>
-					<label>Выберите страну</label>
-					<select>
-						<option>Россия</option>
-					</select>
-				</div>
-				<div>
-					<label>Выберите регион</label>
-					<select>
-						<option>Москва</option>
-						<option>Санкт-Петербург</option>
-					</select>
-				</div>
-				<div class="left clear">
-				<h2>Домашняя сеть</h2>
-					<div>
-						<label>Кол-во мин на номера оператора</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Кол-во мин на другие номера</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Кол-во мин смс</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Трафик в МБ</label>
-						<input type="text">
-					</div>
-				</div>
-				<div class="left">
-				<h2>Внутри страны</h2>
-					<div>
-						<label>Кол-во мин на номера оператора</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Кол-во мин на другие номера</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Кол-во мин смс</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Трафик в МБ</label>
-						<input type="text">
-					</div>
-				</div>
-				<div class="left">
-				<h2>Роуминг</h2>
-					<div>
-						<label>Кол-во мин на номера оператора</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Кол-во мин на другие номера</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Кол-во мин смс</label>
-						<input type="text">
-					</div>
-					<div>
-						<label>Трафик в МБ</label>
-						<input type="text">
-					</div>
-				</div>
-				<div>
-					<button type="submit">Отправить</button>
-					<button type="reset">Сбросить</button>
-				</div>
-				</form>
+<form>
+    <div>
+        <label>Выберите страну</label>
+        <select id="countries" onchange="ChangeCountry();">
+        </select>
+    </div>
+    <div>
+        <label>Выберите регион</label>
+        <select id="regions">
+        </select>
+    </div>
+    <div class="left clear">
+        <h2>Домашняя сеть</h2>
+        <div>
+            <label>Кол-во мин на номера оператора</label>
+            <input placeholder=0 type="text" id="MinuteHomeInside">
+        </div>
+        <div>
+            <label>Кол-во мин на другие номера</label>
+            <input placeholder=0 type="text" id="MinuteHome">
+        </div>
+        <div>
+            <label>Кол-во мин смс</label>
+            <input placeholder=0 type="text" id="SMSHome">
+        </div>
+        <div>
+            <label>Трафик в МБ</label>
+            <input placeholder=0 type="text" id="InternetHome">
+        </div>
+    </div>
+    <div class="left">
+        <h2>Внутри страны</h2>
+        <div>
+            <label>Кол-во мин на номера оператора</label>
+            <input placeholder=0 type="text" id="MinuteHomeInsideCountry">
+        </div>
+        <div>
+            <label>Кол-во мин на другие номера</label>
+            <input placeholder=0 type="text" id="MinuteInside">
+        </div>
+        <div>
+            <label>Кол-во мин смс</label>
+            <input placeholder=0 type="text" id="SMSInside">
+        </div>
+        <div>
+            <label>Трафик в МБ</label>
+            <input placeholder=0 type="text" id="InternetInside">
+        </div>
+    </div>
+    <div class="left">
+        <h2>Роуминг</h2>
+        <div>
+            <label>Кол-во мин на номера оператора</label>
+            <input placeholder=0 type="text" id="MinuteHomeInsideRoaming">
+        </div>
+        <div>
+            <label>Кол-во мин на другие номера</label>
+            <input placeholder=0 type="text" id="MinuteRoaming">
+        </div>
+        <div>
+            <label>Кол-во мин смс</label>
+            <input placeholder=0 type="text" id="SMSRoaming">
+        </div>
+        <div>
+            <label>Трафик в МБ</label>
+            <input placeholder=0 type="text" id="InternetRoaming">
+        </div>
+    </div>
+    <div style="text-align: right;">
+        <button type="button" onclick="GetTable();">Отправить</button>
+        <button type="reset">Сбросить</button>
+    </div>
+</form>
+<div id="OptimalTable"></div>
+<div id="MainTable"></div>
 
-				<table class="rwd-table">
-					<tr>
-						<th>Оператор</th>
-						<th>Абоненская плата</th>
-						<th>Разговоры в регионе на оператора</th>
-						<th>Разговоры в стране на оператора</th>
-						<th>Разговоры в роуминге на оператора</th>
-						<th>Разговоры в регионе на другие</th>
-						<th>Разговоры в стране на другие</th>
-						<th>Разговоры в роуминге на другие</th>
-						<th>СМС в регионе</th>
-						<th>Интернет в стране</th>
-						<th>Интернет в роуминге</th>
-						<th>Итоговая сумма</th>
-					</tr>
-					<tr>
-						<td>Мегафон</td>
-						<td>12</td>
-						<td>54</td>
-						<td>45</td>
-						<td>45</td>
-						<td>56</td>
-						<td>568</td>
-						<td>36</td>
-						<td>7</td>
-						<td>79</td>
-						<td>6</td>
-						<td>33</td>
-					</tr>
-				</table>
+<script>
+    function getXmlHttp() {
+        var xmlhttp;
+        try {
+            xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (e) {
+            try {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (E) {
+                xmlhttp = false;
+            }
+        }
+        if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
+            xmlhttp = new XMLHttpRequest();
+        }
+        return xmlhttp;
+    }
 
+    function GetTable() {
+        if (document.getElementById("countries").value != 0 && document.getElementById("regions").value != 0) {
+            var xmlhttp = getXmlHttp()
+            xmlhttp.open('GET', '/ajaxFunc?func=GetTable&Reg=' + (document.getElementById("regions").value ? document.getElementById("regions").value : 0) +
+                '&MinuteHomeInside=' + (document.getElementById("MinuteHomeInside").value ? document.getElementById("MinuteHomeInside").value : 0) +
+                '&MinuteHomeInsideCountry=' + (document.getElementById("MinuteHomeInsideCountry").value ? document.getElementById("MinuteHomeInsideCountry").value : 0) +
+                '&MinuteHomeInsideRoaming=' + (document.getElementById("MinuteHomeInsideRoaming").value ? document.getElementById("MinuteHomeInsideRoaming").value : 0) +
+                '&MinuteHome=' + (document.getElementById("MinuteHome").value ? document.getElementById("MinuteHome").value : 0) +
+                '&MinuteInside=' + (document.getElementById("MinuteInside").value ? document.getElementById("MinuteInside").value : 0) +
+                '&MinuteRoaming=' + (document.getElementById("MinuteRoaming").value ? document.getElementById("MinuteRoaming").value : 0) +
+                '&SMSHome=' + (document.getElementById("SMSHome").value ? document.getElementById("SMSHome").value : 0) +
+                '&SMSInside=' + (document.getElementById("SMSInside").value ? document.getElementById("SMSInside").value : 0) +
+                '&SMSRoaming=' + (document.getElementById("SMSRoaming").value ? document.getElementById("SMSRoaming").value : 0) +
+                '&InternetHome=' + (document.getElementById("InternetHome").value ? document.getElementById("InternetHome").value : 0) +
+                '&InternetInside=' + (document.getElementById("InternetInside").value ? document.getElementById("InternetInside").value : 0) +
+                '&InternetRoaming=' + (document.getElementById("InternetRoaming").value ? document.getElementById("InternetRoaming").value : 0), true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4) {
+                    if (xmlhttp.status == 200) {
+                        var jsonObject = JSON.parse(xmlhttp.responseText);
+                        console.log(jsonObject);
+                        var text = "Общая сводка:<table class=\"rwd-table\">";
+                        for (i = 0; i < jsonObject["count"]; i++) {
+                            text += "<tr>";
+                            for (j = 0; j < 16; j++) {
+                                if (i == 0)
+                                    text += "<th>";
+                                else
+                                    text += "<td>";
+                                text += jsonObject["mainarray"][i][j];
+                                if (i == 0)
+                                    text += "</th>";
+                                else
+                                    text += "</td>";
+                            }
+                            text += "</tr>";
+                        }
+                        text += "</table>";
+                        document.getElementById("MainTable").innerHTML = text;
+
+                        var text = "Оптимальный тариф:<table class=\"rwd-table\">";
+                        for (i = 0; i < jsonObject["optimal_count"]; i++) {
+                            text += "<tr>";
+                            for (j = 0; j < 3; j++) {
+                                if (i == 0)
+                                    text += "<th>";
+                                else
+                                    text += "<td>";
+                                text += jsonObject["optimal"][i][j];
+                                if (i == 0)
+                                    text += "</th>";
+                                else
+                                    text += "</td>";
+                            }
+                            text += "</tr>";
+                        }
+                        text += "</table>";
+                        document.getElementById("OptimalTable").innerHTML = text;
+                    }
+                }
+            };
+            xmlhttp.send("");
+        }
+    }
+
+    function ChangeCountry() {
+        if (document.getElementById("countries").value != 0) {
+            var xmlhttp = getXmlHttp()
+            xmlhttp.open('GET', '/ajaxFunc?func=GetRegions&country=' + document.getElementById("countries").value, true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4) {
+                    if (xmlhttp.status == 200) {
+                        var jsonObject = JSON.parse(xmlhttp.responseText);
+                        var text = "<option value=0>Выберите регион</option>";
+                        for (i = 0; i < jsonObject["count"]; i++)
+                            text += "<option value=" + jsonObject["mainarray"][i][0] + ">" + jsonObject["mainarray"][i][1] + "</option>";
+                        document.getElementById("regions").innerHTML = text;
+                    }
+                }
+            };
+            xmlhttp.send("");
+        }
+    }
+
+
+    var xmlhttp = getXmlHttp()
+    xmlhttp.open('GET', '/ajaxFunc?func=GetCountries', true);
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4) {
+            if (xmlhttp.status == 200) {
+                var jsonObject = JSON.parse(xmlhttp.responseText);
+                var text = "<option value=0>Выберите страну</option>";
+                for (i = 0; i < jsonObject["count"]; i++)
+                    text += "<option value=" + jsonObject["mainarray"][i][0] + ">" + jsonObject["mainarray"][i][1] + "</option>";
+                document.getElementById("countries").innerHTML = text;
+            }
+        }
+    };
+    xmlhttp.send("");
+</script>
+</body>
 </html>
