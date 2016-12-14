@@ -2,11 +2,11 @@
 SELECT * from Countries;
 
 --GetCountries
-SELECT * from Regions WHERE id = XXX;
+SELECT * from Regions WHERE id = 1;
 
 --GetTable
 WITH Reg AS (
-	SELECT XXX
+	SELECT 1
 ),
 MinuteHomeInside AS ( --дома на оператора
 	SELECT 5000
@@ -36,13 +36,13 @@ SMSRoaming AS (
 	SELECT 1
 ),
 InternetHome AS (
-	SELECT 2049
+	SELECT 0
 ),
 InternetInside AS (
-	SELECT 1
+	SELECT 0
 ),
 InternetRoaming AS (
-	SELECT 1
+	SELECT 0
 ),
 ResultTable AS (
 SELECT Operators.Name AS r1,
@@ -211,13 +211,18 @@ SELECT Operators.Name AS r1,
 			(CASE
 				WHEN Home.IsIncludeInternet = 1 THEN --включено в абоненскую
 					(CASE
-						WHEN Plans.MBytes - (SELECT * FROM InternetHome) < 0 THEN --превысили лимит
+						WHEN Plans.MBytes - (SELECT * FROM InternetHome) < 0 AND (SELECT * FROM InternetHome) > 0 THEN --превысили лимит
 							(((SELECT * FROM InternetHome) - Plans.MBytes)/Home.PacketSize + 1) * Home.PricePerInternetPacket
 						ELSE
 							0
 					END)
 				ELSE
-					((SELECT * FROM InternetHome)/Home.PacketSize + 1) * Home.PricePerInternetPacket
+           (CASE
+               WHEN (SELECT * FROM InternetHome) > 0 THEN
+					          ((SELECT * FROM InternetHome)/Home.PacketSize + 1) * Home.PricePerInternetPacket
+               ELSE
+                0
+            END)
 			END)
 		ELSE
 			0
@@ -227,7 +232,7 @@ SELECT Operators.Name AS r1,
 			(CASE
 				WHEN Inside.IsIncludeInternet = 1 THEN --включено в абоненскую
 					(CASE
-						WHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside) < 0 THEN --превысили лимит
+						WHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside) < 0 AND (SELECT * FROM InternetInside) > 0 THEN --превысили лимит
 							(((SELECT * FROM InternetInside) -
 								(CASE WHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet < 0 THEN 0 ELSE Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet END)) /
 								Inside.PacketSize + 1) * Inside.PricePerInternetPacket
@@ -235,7 +240,12 @@ SELECT Operators.Name AS r1,
 							0
 					END)
 				ELSE
-					((SELECT * FROM InternetInside)/Inside.PacketSize + 1) * Inside.PricePerInternetPacket
+            (CASE
+               WHEN (SELECT * FROM InternetInside) > 0 THEN
+					          ((SELECT * FROM InternetInside)/Inside.PacketSize + 1) * Inside.PricePerInternetPacket
+                ELSE
+                0
+            END)
 			END)
 		ELSE
 			0
@@ -245,7 +255,7 @@ SELECT Operators.Name AS r1,
 			(CASE
 				WHEN Roaming.IsIncludeInternet = 1 THEN --включено в абоненскую
 					(CASE
-						WHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside)*Inside.IsIncludeInternet - (SELECT * FROM InternetRoaming) < 0 THEN --превысили лимит
+						WHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside)*Inside.IsIncludeInternet - (SELECT * FROM InternetRoaming) < 0 AND (SELECT * FROM InternetRoaming) > 0 THEN --превысили лимит
 							(((SELECT * FROM InternetRoaming) -
 								(CASE WHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside)*Inside.IsIncludeInternet < 0 THEN 0 ELSE Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside)*Inside.IsIncludeInternet END)) /
 								Roaming.PacketSize + 1) * Roaming.PricePerInternetPacket
@@ -253,7 +263,12 @@ SELECT Operators.Name AS r1,
 							0
 					END)
 				ELSE
-					((SELECT * FROM InternetRoaming)/Roaming.PacketSize + 1) * Roaming.PricePerInternetPacket
+            (CASE
+               WHEN (SELECT * FROM InternetRoaming) > 0 THEN
+					      ((SELECT * FROM InternetRoaming)/Roaming.PacketSize + 1) * Roaming.PricePerInternetPacket
+            ELSE
+                0
+            END)
 			END)
 		ELSE
 			0
