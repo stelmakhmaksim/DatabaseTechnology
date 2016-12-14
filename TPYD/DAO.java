@@ -35,7 +35,7 @@ public class DAO {
 
     public static String GetRegions(int CountryId) throws SQLException, ClassNotFoundException {
         Connection c = getConnection();
-        PreparedStatement ps = c.prepareStatement("SELECT Id, Name from Regions WHERE id = " + CountryId + ";");
+        PreparedStatement ps = c.prepareStatement("SELECT Id, Name from Regions WHERE countryid = " + CountryId + ";");
         ResultSet resultSet = ps.executeQuery();
         JSONObject ojson = new JSONObject();
         int count = 0;
@@ -226,13 +226,18 @@ public class DAO {
                 "\t\t\t(CASE\n" +
                 "\t\t\t\tWHEN Home.IsIncludeInternet = 1 THEN --включено в абоненскую\n" +
                 "\t\t\t\t\t(CASE\n" +
-                "\t\t\t\t\t\tWHEN Plans.MBytes - (SELECT * FROM InternetHome) < 0 THEN --превысили лимит\n" +
+                "\t\t\t\t\t\tWHEN Plans.MBytes - (SELECT * FROM InternetHome) < 0 AND (SELECT * FROM InternetHome) > 0 THEN --превысили лимит\n" +
                 "\t\t\t\t\t\t\t(((SELECT * FROM InternetHome) - Plans.MBytes)/Home.PacketSize + 1) * Home.PricePerInternetPacket\n" +
                 "\t\t\t\t\t\tELSE\n" +
                 "\t\t\t\t\t\t\t0\n" +
                 "\t\t\t\t\tEND)\n" +
                 "\t\t\t\tELSE\n" +
-                "\t\t\t\t\t((SELECT * FROM InternetHome)/Home.PacketSize + 1) * Home.PricePerInternetPacket\n" +
+                "(CASE\n" +
+                "WHEN (SELECT * FROM InternetHome) > 0 THEN\n" +
+                "((SELECT * FROM InternetHome)/Home.PacketSize + 1) * Home.PricePerInternetPacket\n" +
+                "ELSE\n" +
+                "0\n" +
+                "END)\n" +
                 "\t\t\tEND)\n" +
                 "\t\tELSE\n" +
                 "\t\t\t0\n" +
@@ -242,7 +247,7 @@ public class DAO {
                 "\t\t\t(CASE\n" +
                 "\t\t\t\tWHEN Inside.IsIncludeInternet = 1 THEN --включено в абоненскую\n" +
                 "\t\t\t\t\t(CASE\n" +
-                "\t\t\t\t\t\tWHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside) < 0 THEN --превысили лимит\n" +
+                "\t\t\t\t\t\tWHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside) < 0 AND (SELECT * FROM InternetInside) > 0 THEN --превысили лимит\n" +
                 "\t\t\t\t\t\t\t(((SELECT * FROM InternetInside) -\n" +
                 "\t\t\t\t\t\t\t\t(CASE WHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet < 0 THEN 0 ELSE Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet END)) /\n" +
                 "\t\t\t\t\t\t\t\tInside.PacketSize + 1) * Inside.PricePerInternetPacket\n" +
@@ -250,7 +255,12 @@ public class DAO {
                 "\t\t\t\t\t\t\t0\n" +
                 "\t\t\t\t\tEND)\n" +
                 "\t\t\t\tELSE\n" +
-                "\t\t\t\t\t((SELECT * FROM InternetInside)/Inside.PacketSize + 1) * Inside.PricePerInternetPacket\n" +
+                "(CASE\n" +
+                "               WHEN (SELECT * FROM InternetInside) > 0 THEN\n" +
+                "\t\t\t\t\t          ((SELECT * FROM InternetInside)/Inside.PacketSize + 1) * Inside.PricePerInternetPacket\n" +
+                "                ELSE\n" +
+                "                0\n" +
+                "            END)" +
                 "\t\t\tEND)\n" +
                 "\t\tELSE\n" +
                 "\t\t\t0\n" +
@@ -260,7 +270,7 @@ public class DAO {
                 "\t\t\t(CASE\n" +
                 "\t\t\t\tWHEN Roaming.IsIncludeInternet = 1 THEN --включено в абоненскую\n" +
                 "\t\t\t\t\t(CASE\n" +
-                "\t\t\t\t\t\tWHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside)*Inside.IsIncludeInternet - (SELECT * FROM InternetRoaming) < 0 THEN --превысили лимит\n" +
+                "\t\t\t\t\t\tWHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside)*Inside.IsIncludeInternet - (SELECT * FROM InternetRoaming) < 0 AND (SELECT * FROM InternetRoaming) > 0 THEN --превысили лимит\n" +
                 "\t\t\t\t\t\t\t(((SELECT * FROM InternetRoaming) -\n" +
                 "\t\t\t\t\t\t\t\t(CASE WHEN Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside)*Inside.IsIncludeInternet < 0 THEN 0 ELSE Plans.MBytes - (SELECT * FROM InternetHome)*Home.IsIncludeInternet - (SELECT * FROM InternetInside)*Inside.IsIncludeInternet END)) /\n" +
                 "\t\t\t\t\t\t\t\tRoaming.PacketSize + 1) * Roaming.PricePerInternetPacket\n" +
@@ -268,7 +278,12 @@ public class DAO {
                 "\t\t\t\t\t\t\t0\n" +
                 "\t\t\t\t\tEND)\n" +
                 "\t\t\t\tELSE\n" +
-                "\t\t\t\t\t((SELECT * FROM InternetRoaming)/Roaming.PacketSize + 1) * Roaming.PricePerInternetPacket\n" +
+                "(CASE\n" +
+                "               WHEN (SELECT * FROM InternetRoaming) > 0 THEN\n" +
+                "\t\t\t\t\t      ((SELECT * FROM InternetRoaming)/Roaming.PacketSize + 1) * Roaming.PricePerInternetPacket\n" +
+                "            ELSE\n" +
+                "                0\n" +
+                "            END)" +
                 "\t\t\tEND)\n" +
                 "\t\tELSE\n" +
                 "\t\t\t0\n" +
@@ -303,6 +318,9 @@ public class DAO {
         b.add("Разговоры в стране на другие");
         b.add("Разговоры в роуминге на другие");
         b.add("СМС в регионе");
+        b.add("СМС в стране");
+        b.add("СМС в роуминге");
+        b.add("Интернет в регионе");
         b.add("Интернет в стране");
         b.add("Интернет в роуминге");
         b.add("Итоговая сумма");
@@ -345,7 +363,7 @@ public class DAO {
             JSONArray a = new JSONArray();
             a.add(resultSet.getString(1));
             a.add(resultSet.getString(2));
-            a.add(resultSet.getInt(3));
+            a.add((float) resultSet.getInt(3) / 100 + " руб.");
             mainArray.add(a);
             count++;
         }
@@ -353,7 +371,9 @@ public class DAO {
         ojson.put("optimal", mainArray);
         return ojson.toString();
     }
-    /*public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        System.out.println(GetCountries());
-    }*/
+
+
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        System.out.println(GetRegions(2));
+    }
 }
